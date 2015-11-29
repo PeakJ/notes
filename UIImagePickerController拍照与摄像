@@ -1,0 +1,194 @@
+该类继承自UINavigationController类
+步骤：
+检查媒体来源模式是否可用
+检查该来源模式下所支持的媒体类型
+创建图像选取控制器，设置其属性并显示
+在委托协议方法中处理
+
+1.检查媒体来源
+调用UIImagePickerController类的静态方法isSourceTypeAvailable来检查
+sourceType是一个UIImagePickerControllerSourceType类型的枚举值，它表示图像选取控制器的3种不同的媒体来源模式
+UIImagePickerControllerSourceTypePhotoLibrary:照片库模式。图像选取控制器以该模式显示时会浏览系统照片库的根目录。
+UIImagePickerControllerSourceTypeCamera:相机模式，图像选取控制器以该模式显示时可以进行拍照或摄像。
+UIImagePickerControllerSourceTypeSavedPhotosAlbum:相机胶卷模式，图像选取控制器以该模式显示时会浏览相机胶卷目录。
+如果设备支持指定的媒体来源模式，则isSourceTypeAvailable:方法返回YES，否则返回NO。
+2.检查支持的媒体类型
+调用UIImagePickerController类的另一个静态方法 availableMediaTypesForSourceType:
+返回的是字符串数组，kUTTypeImage表示静态图片，kUTTypeMovie表示视频。这两个字符串常量定义在MobileCoreServices框架中。
+
+参数info是一个字典，包含媒体类型，拍照的原始图片，编辑后的图片，或是摄像的视频文件的URL等。
+//
+//  ViewController.h
+//  Camera
+//
+//  Created by gao wuhang on 12-11-23.
+//  Copyright (c) 2012年 gao wuhang. All rights reserved.
+//
+
+#import
+
+@interface ViewController : UIViewController<</span>UINavigationControllerDelegate,UIImagePickerControllerDelegate>
+
+- (IBAction)takePictureButtonClick:(id)sender;
+- (IBAction)captureVideoButtonClick:(id)sender;
+
+@end
+//
+//  ViewController.m
+//  Camera
+//
+//  Created by gao wuhang on 12-11-23.
+//  Copyright (c) 2012年 gao wuhang. All rights reserved.
+//
+
+#import "ViewController.h"
+#import
+#import
+
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+
+- (IBAction)takePictureButtonClick:(id)sender{
+    //检查相机模式是否可用
+    if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        NSLog(@"sorry, no camera or camera is unavailable.");
+        return;
+    }
+    //获得相机模式下支持的媒体类型
+    NSArray* availableMediaTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypeCamera];
+    BOOL canTakePicture = NO;
+    for (NSString* mediaType in availableMediaTypes) {
+        if ([mediaType isEqualToString:(NSString*)kUTTypeImage]) {
+            //支持拍照
+            canTakePicture = YES;
+            break;
+        }
+    }
+    //检查是否支持拍照
+    if (!canTakePicture) {
+        NSLog(@"sorry, taking picture is not supported.");
+        return;
+    }
+    //创建图像选取控制器
+    UIImagePickerController* imagePickerController = [[UIImagePickerController alloc] init];
+    //设置图像选取控制器的来源模式为相机模式
+    imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+    //设置图像选取控制器的类型为静态图像
+    imagePickerController.mediaTypes = [[[NSArray alloc] initWithObjects:(NSString*)kUTTypeImage, nil] autorelease];
+    //允许用户进行编辑
+    imagePickerController.allowsEditing = YES;
+    //设置委托对象
+    imagePickerController.delegate = self;
+    //以模视图控制器的形式显示
+    [self presentModalViewController:imagePickerController animated:YES];
+    [imagePickerController release];
+}
+
+- (IBAction)captureVideoButtonClick:(id)sender{
+    //检查相机模式是否可用
+    if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        NSLog(@"sorry, no camera or camera is unavailable!!!");
+        return;
+    }
+    //获得相机模式下支持的媒体类型
+    NSArray* availableMediaTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypeCamera];
+    BOOL canTakeVideo = NO;
+    for (NSString* mediaType in availableMediaTypes) {
+        if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
+            //支持摄像
+            canTakeVideo = YES;
+            break;
+        }
+    }
+    //检查是否支持摄像
+    if (!canTakeVideo) {
+        NSLog(@"sorry, capturing video is not supported.!!!");
+        return;
+    }
+    //创建图像选取控制器
+    UIImagePickerController* imagePickerController = [[UIImagePickerController alloc] init];
+    //设置图像选取控制器的来源模式为相机模式
+    imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+    //设置图像选取控制器的类型为动态图像
+    imagePickerController.mediaTypes = [[[NSArray alloc] initWithObjects:(NSString*)kUTTypeMovie, nil] autorelease];
+    //设置摄像图像品质
+    imagePickerController.videoQuality = UIImagePickerControllerQualityTypeHigh;
+    //设置最长摄像时间
+    imagePickerController.videoMaximumDuration = 30;
+    //允许用户进行编辑
+    imagePickerController.allowsEditing = YES;
+    //设置委托对象
+    imagePickerController.delegate = self;
+    //以模式视图控制器的形式显示
+    [self presentModalViewController:imagePickerController animated:YES];
+    [imagePickerController release];
+    
+}
+
+- (void)image:(UIImage*)image didFinishSavingWithError:(NSError*)error contextInfo:(void*)contextInfo{
+    if (!error) {
+        NSLog(@"picture saved with no error.");
+    }
+    else
+    {
+        NSLog(@"error occured while saving the picture%@", error);
+    }
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
+    //打印出字典中的内容
+    NSLog(@"get the media info: %@", info);
+    //获取媒体类型
+    NSString* mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+    //判断是静态图像还是视频
+    if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
+        //获取用户编辑之后的图像
+    UIImage* editedImage = [info objectForKey:UIImagePickerControllerEditedImage];
+        //将该图像保存到媒体库中
+                                UIImageWriteToSavedPhotosAlbum(editedImage, self,@selector(image:didFinishSavingWithError:contextInfo:), NULL);
+    }else if ([mediaType isEqualToString:(NSString *)kUTTypeMovie])
+                                {
+                                    //获取视频文件的url
+                                    NSURL* mediaURL = [infoobjectForKey:UIImagePickerControllerMediaURL];
+                                    //创建ALAssetsLibrary对象并将视频保存到媒体库
+                                    ALAssetsLibrary* assetsLibrary = [[ALAssetsLibrary alloc]init];
+                                    [assetsLibrary writeVideoAtPathToSavedPhotosAlbum:mediaURLcompletionBlock:^(NSURL *assetURL, NSError *error) {
+                                        if (!error) {
+                                            NSLog(@"captured video saved with no error.");
+                                        }else
+                                        {
+                                            NSLog(@"error occured while saving the video:%@", error);
+                                        }
+                                    }];
+                                    [assetsLibrary release];
+                                }
+                                [picker dismissModalViewControllerAnimated:YES];
+    
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
+    [picker dismissModalViewControllerAnimated:YES];
+}
+                                
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+// Do any additional setup after loading the view, typically from a nib.
+}
+
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+}
+
+@end
