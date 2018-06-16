@@ -1,6 +1,6 @@
 # notes
 ## markdown语法片段
-> 这个readme文档仅仅是为了联系记录一些markdown的用法
+> 这个readme文档仅仅是为了练习记录一些markdown的用法
 内容随意为之，没有任何实际意义，可以忽略
 >> 引用中的引用
 [百度](https://www.baidu.com)
@@ -13,20 +13,24 @@
 ***
 上面是分割线
 
-###列表
-####无序
+### 列表
+
+#### 无序
+
 - 第一项
 - 第二项
 - 第三项
 
-####有序
+#### 有序
+
 1. 第四项
 2. 第五项 
    第五项增加内容
 3. 第六项
 2. 第七项
 
-###代码片段
+### 代码片段
+
 ` var obj = eval(response.data);
   $scope.provinceId = obj[0].provinceId;
   $scope.cityId = obj[0].cityId;
