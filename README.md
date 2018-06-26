@@ -8,7 +8,7 @@
 **加粗字体**
 *倾斜字体*
 <div>这段文字放在了一个div标签中</div>
-<span>这段文字放在了一个**span**标签中了</span>
+<span>这段文字放在了一个span标签中了</span>
 
 ***
 上面是分割线
@@ -31,14 +31,16 @@
 
 ### 代码片段
 
-` var obj = eval(response.data);
+```javascript
+  var obj = eval(response.data);
   $scope.provinceId = obj[0].provinceId;
   $scope.cityId = obj[0].cityId;
   $scope.regionId = obj[0].areaId;
   $scope.streetId = obj[0].streetId;
   var regionIndex = obj[0].regionName.indexOf('/');
   $scope.region = obj[0].regionName.substr(0, regionIndex);
-  $scope.findInit();`
+  $scope.findInit();
+  ```
   
     区块区块区块区块
     区块区块区块区块
